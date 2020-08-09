@@ -1,18 +1,15 @@
 package me.modmuss50.optifabric.mod;
 
 import com.chocohead.mm.api.ClassTinkerers;
+import com.google.common.collect.Lists;
 import me.modmuss50.optifabric.patcher.ASMUtils;
-import me.modmuss50.optifabric.patcher.fixes.ChunkRendererFix;
 import me.modmuss50.optifabric.patcher.ClassCache;
-import me.modmuss50.optifabric.patcher.fixes.ClassFixer;
 import me.modmuss50.optifabric.patcher.fixes.OptifineFixer;
-import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FrameNode;
 import org.objectweb.asm.tree.MethodNode;
-
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +18,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class OptifineInjector {
@@ -60,6 +58,8 @@ public class OptifineInjector {
 		optifineFixer.getFixers(target.name)
 				.forEach(classFixer -> classFixer.fix(source, target));
 
+		List<MethodNode> previousMethods = Lists.newArrayList(target.methods);
+
 		target.methods = source.methods;
 		target.fields = source.fields;
 		target.interfaces = source.interfaces;
@@ -79,7 +79,13 @@ public class OptifineInjector {
 
 		// Lets make every class we touch public
 		target.access = modAccess(target.access);
-		target.methods.forEach(methodNode -> methodNode.access = modAccess(methodNode.access));
+		target.methods.forEach(methodNode -> {
+			previousMethods.stream().filter(previousMethod -> Objects.equals(previousMethod.name, methodNode.name) && Objects.equals(previousMethod.desc, methodNode.desc)).findFirst().ifPresent(previousMethod -> {
+				if ((previousMethod.access & Opcodes.ACC_PUBLIC) != 0) {
+					methodNode.access = modAccess(methodNode.access);
+				}
+			});
+		});
 		target.fields.forEach(fieldNode -> fieldNode.access = modAccess(fieldNode.access));
 	};
 
@@ -94,7 +100,7 @@ public class OptifineInjector {
 	private ClassNode getSourceClassNode(ClassNode classNode) {
 		String name = classNode.name.replaceAll("\\.", "/") + ".class";
 		byte[] bytes = classCache.getAndRemove(name);
-		if(bytes == null) {
+		if (bytes == null) {
 			throw new RuntimeException("Failed to find patched class for: " + name);
 		}
 		return ASMUtils.readClassFromBytes(bytes);
