@@ -84,7 +84,7 @@ public class OptifineInjector {
 	};
 
 	private static int modAccess(int access) {
-		if ((access & 0x7) != Opcodes.ACC_PRIVATE) {
+		if ((access & 0x7) != 0) {
 			return (access & (~0x7)) | Opcodes.ACC_PUBLIC;
 		} else {
 			return access;
