@@ -38,6 +38,9 @@ public class OptifineFixer {
 
 		//net/minecraft/client/render/item/HeldItemRenderer$1
 		skipClass("class_759$1");
+		
+		//net/minecraft/entity/mob/MobEntity
+		registerFix("class_1308", new MobEntityFix());
 	}
 
 	private void registerFix(String className, ClassFixer classFixer) {
