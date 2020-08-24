@@ -30,6 +30,9 @@ repositories {
 	maven { url "https://dl.bintray.com/shedaniel/shedaniel-mods" }
 	maven { url 'https://jitpack.io' }
     maven { url 'https://www.cursemaven.com' }
+    flatDir {
+        dirs 'jars'
+    }
 }
 
 dependencies {
@@ -59,6 +62,24 @@ dependencies {
 
     modRuntime "curse.maven:lithium:3000628"
     modRuntime "curse.maven:phosphor:2987621"
+
+    fileTree(dir: 'jars', include: '*.jar').each {
+        String baseName = it.name.replace(".jar", "")
+        String version = "0.1.0"
+        int split = baseName.lastIndexOf('-')
+
+        if (split != -1) {
+            version = baseName.substring(split + 1)
+            baseName = baseName.substring(0, split)
+        }
+
+        String name = "testmod:${baseName}:${version}"
+
+        System.out.println("Found test mod: " + it.name.replace(".jar", "") + " -> " + name)
+
+        modCompileOnly name
+        modRuntime name
+    }
 }
 
 task unzip(type: Copy) {
