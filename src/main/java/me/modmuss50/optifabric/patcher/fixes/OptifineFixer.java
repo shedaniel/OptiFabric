@@ -1,18 +1,16 @@
 package me.modmuss50.optifabric.patcher.fixes;
 
 import me.modmuss50.optifabric.util.RemappingUtils;
+import net.fabricmc.loader.api.FabricLoader;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class OptifineFixer {
 
 	public static final OptifineFixer INSTANCE = new OptifineFixer();
 
 	private HashMap<String, List<ClassFixer>> classFixes = new HashMap<>();
-	private List<String> skippedClass = new ArrayList<>();
+	private Set<String> skippedClass = new HashSet<>();
 
 	private OptifineFixer() {
 		//net/minecraft/client/render/chunk/ChunkBuilder$BuiltChunk
@@ -41,6 +39,14 @@ public class OptifineFixer {
 		
 		//net/minecraft/entity/mob/MobEntity
 		registerFix("class_1308", new MobEntityFix());
+		
+		if (FabricLoader.getInstance().isModLoaded("patchouli")) {
+			System.out.println("We give up fixing this for now, no more custom item textures.");
+			//net/minecraft/client/render/model/json/ModelOverrideList
+			registerFix("class_806", (optifine, minecraft) -> {
+				optifine.methods = minecraft.methods;
+			});
+		}
 	}
 
 	private void registerFix(String className, ClassFixer classFixer) {

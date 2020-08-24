@@ -6,26 +6,21 @@ import me.modmuss50.optifabric.patcher.ASMUtils;
 import me.modmuss50.optifabric.patcher.ClassCache;
 import me.modmuss50.optifabric.patcher.fixes.OptifineFixer;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FrameNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class OptifineInjector {
 
 	ClassCache classCache;
 
-	private static List<String> patched = new ArrayList<>();
+	private static Set<String> patched = new HashSet<>();
 	private final OptifineFixer optifineFixer = OptifineFixer.INSTANCE;
 
 	public OptifineInjector(ClassCache classCache) {
@@ -40,7 +35,7 @@ public class OptifineInjector {
 	public final Consumer<ClassNode> transformer = target -> {
 
 		if(patched.contains(target.name)) {
-			System.out.println("Already patched" + target.name);
+			System.out.println("Already patched " + target.name);
 			return;
 		}
 		patched.add(target.name);

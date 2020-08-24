@@ -30,6 +30,7 @@
       "me.modmuss50.optifabric.mod.OptifabricSetup"
     ]
   },
+  "accessWidener": "optifabric.accessWidener",
   "depends": {
     "fabricloader": ">=0.8.8",
     "minecraft": "1.16.2"
