@@ -121,10 +121,10 @@ public class OptifineInjector {
 	}
 	
 	private static int unfinal(int origin, int target) {
-	    if (!Modifier.isFinal(origin))
-	        return target & (~Modifier.FINAL);
-	    return target;
-    }
+		if (!Modifier.isFinal(origin))
+			return target & (~Modifier.FINAL);
+		return target;
+	}
 
 	private ClassNode getSourceClassNode(ClassNode classNode) {
 		byte[] bytes = classCache.popClass(classNode.name);
