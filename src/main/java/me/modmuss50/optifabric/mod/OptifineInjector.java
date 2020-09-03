@@ -97,6 +97,7 @@ public class OptifineInjector {
 	}
 
 	private static int widerAccess(int origin, int target) {
+        target = unfinal(origin, target);
 		switch (target & 0x7) {
 		case Modifier.PUBLIC:
 			return target;
@@ -118,6 +119,12 @@ public class OptifineInjector {
 			return target;
 		}
 	}
+	
+	private static int unfinal(int origin, int target) {
+	    if (!Modifier.isFinal(origin))
+	        return target & (~Modifier.FINAL);
+	    return target;
+    }
 
 	private ClassNode getSourceClassNode(ClassNode classNode) {
 		byte[] bytes = classCache.popClass(classNode.name);
